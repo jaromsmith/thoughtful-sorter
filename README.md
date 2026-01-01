@@ -1,7 +1,7 @@
 # Thoughtful AI - Technical Challenge (Package Sorter)
 
 ## Overview
-This repository contains a Java-based implementation for a robotic arm package sorter. The system categorizes packages into **STANDARD**, **SPECIAL**, or **REJECTED** stacks based on their physical dimensions and mass.
+This repository contains a Java-based implementation for a robotic arm package sorter specified at https://thoughtfulautomation.notion.site/Core-Engineering-Technical-Screen-b61b6f6980714c198dc49b91dd23d695. The system categorizes packages into **STANDARD**, **SPECIAL**, or **REJECTED** stacks based on their physical dimensions and mass.
 
 ## Logic Implementation
 The solution determines the package status based on the following criteria:
