@@ -1,53 +1,48 @@
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+public class MainTest {
 
-import static org.junit.jupiter.api.Assertions.*;
+    public static void main(String[] args) {
+        System.out.println("--- Starting Thoughtful AI Package Sorter Tests ---");
 
-class MainTest {
+        try {
+            // 1. Parameterized-style tests for categories
+            testSort(10, 10, 10, 10, "STANDARD", "Small and light");
+            testSort(200, 10, 10, 10, "SPECIAL", "Bulky (dimension), not heavy");
+            testSort(100, 100, 100, 10, "SPECIAL", "Bulky (volume), not heavy");
+            testSort(10, 10, 10, 25, "SPECIAL", "Not bulky, heavy");
+            testSort(200, 100, 100, 25, "REJECTED", "Bulky and heavy");
 
-    @ParameterizedTest
-    @DisplayName("Should correctly categorize packages based on rules")
-    @CsvSource({
-            "10, 10, 10, 10, STANDARD",    // Small and light
-            "200, 10, 10, 10, SPECIAL",   // Bulky (dimension), not heavy
-            "100, 100, 100, 10, SPECIAL", // Bulky (volume), not heavy
-            "10, 10, 10, 25, SPECIAL",    // Not bulky, heavy
-            "200, 100, 100, 25, REJECTED" // Bulky and heavy
-    })
-    void testSortCategories(double w, double h, double l, double m, String expected) {
-        assertEquals(expected, Main.sort(w, h, l, m));
+            // 2. Boundary tests
+            testSort(150, 10, 10, 10, "SPECIAL", "Boundary: Dimension at 150cm");
+            testSort(100, 100, 100, 10, "SPECIAL", "Boundary: Volume at 1,000,000cm³");
+            testSort(10, 10, 10, 20, "SPECIAL", "Boundary: Mass at 20kg");
+
+            // 3. Exception tests (Non-positive inputs)
+            testException(0, 10, 10, 10, "Width 0");
+            testException(10, -1, 10, 10, "Height -1");
+            testException(10, 10, 0, 10, "Length 0");
+            testException(10, 10, 10, -5, "Mass -5");
+
+            System.out.println("\n✅ SUCCESS: All tests passed!");
+        } catch (Exception e) {
+            System.err.println("\n❌ FAILURE: " + e.getMessage());
+            System.exit(1);
+        }
     }
 
-    @Test
-    @DisplayName("Boundary: Exactly at the bulky dimension limit (150cm)")
-    void testDimensionBoundary() {
-        assertEquals("SPECIAL", Main.sort(150, 10, 10, 10));
+    private static void testSort(double w, double h, double l, double m, String expected, String desc) {
+        String actual = Main.sort(w, h, l, m);
+        if (!expected.equals(actual)) {
+            throw new RuntimeException(desc + " Failed: Expected " + expected + " but got " + actual);
+        }
+        System.out.println("Pass: " + desc);
     }
 
-    @Test
-    @DisplayName("Boundary: Exactly at the bulky volume limit (1,000,000cm³)")
-    void testVolumeBoundary() {
-        // 100 * 100 * 100 = 1,000,000
-        assertEquals("SPECIAL", Main.sort(100, 100, 100, 10));
-    }
-
-    @Test
-    @DisplayName("Boundary: Exactly at the heavy mass limit (20kg)")
-    void testMassBoundary() {
-        assertEquals("SPECIAL", Main.sort(10, 10, 10, 20));
-    }
-
-    @ParameterizedTest
-    @DisplayName("Should throw exception for non-positive inputs")
-    @CsvSource({
-            "0, 10, 10, 10",
-            "10, -1, 10, 10",
-            "10, 10, 0, 10",
-            "10, 10, 10, -5"
-    })
-    void testInvalidInputs(double w, double h, double l, double m) {
-        assertThrows(IllegalArgumentException.class, () -> Main.sort(w, h, l, m));
+    private static void testException(double w, double h, double l, double m, String desc) {
+        try {
+            Main.sort(w, h, l, m);
+            throw new RuntimeException("Validation Failed for " + desc + ": No exception thrown.");
+        } catch (IllegalArgumentException e) {
+            System.out.println("Pass: Caught expected exception for " + desc);
+        }
     }
 }
